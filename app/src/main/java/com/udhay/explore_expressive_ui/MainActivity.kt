@@ -9,39 +9,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.udhay.explore_expressive_ui.ui.theme.Explore_expressive_uiTheme
+import com.udhay.explore_expressive_ui.ui.widgets.ThemeToggleButton
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Explore_expressive_uiTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+            var isDarkTheme by remember { mutableStateOf(false) }
+            Explore_expressive_uiTheme(darkTheme = isDarkTheme) {
+
+                ThemeToggleButton(
+                    onToggle = { isDarkTheme = !isDarkTheme },
+                    isDark = isDarkTheme
+                )
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Explore_expressive_uiTheme {
-        Greeting("Android")
     }
 }
