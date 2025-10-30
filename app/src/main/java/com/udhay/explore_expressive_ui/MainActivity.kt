@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            var isDarkTheme by remember { mutableStateOf(false) }
+            var isDarkTheme: Boolean by remember { mutableStateOf(false) }
             Explore_expressive_uiTheme(darkTheme = isDarkTheme) {
 
                 ThemeToggleButton(
