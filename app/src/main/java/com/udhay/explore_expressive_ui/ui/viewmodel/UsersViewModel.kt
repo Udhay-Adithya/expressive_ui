@@ -27,7 +27,7 @@ class UsersViewModel @Inject constructor(
     fun fetchAllUsers() {
         viewModelScope.launch {
             _usersState.value = UsersUiState.Loading
-            when (val result = repository.getPostsFeed()) {
+            when (val result = repository.getAllUsers()) {
                 is Result.Success -> {
                     _usersState.value = UsersUiState.Success(result.data)
                 }
@@ -41,7 +41,7 @@ class UsersViewModel @Inject constructor(
     fun fetchUser(userId: String) {
         viewModelScope.launch {
             _userState.value = UserUiState.Loading
-            when (val result = repository.getPost(userId)) {
+            when (val result = repository.getUser(userId)) {
                 is Result.Success -> {
                     _userState.value = UserUiState.Success(result.data)
                 }

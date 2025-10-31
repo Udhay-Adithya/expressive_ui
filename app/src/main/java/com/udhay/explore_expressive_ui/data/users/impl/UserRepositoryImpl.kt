@@ -8,7 +8,7 @@ import com.udhay.explore_expressive_ui.data.Result
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(private val apiService: UsersApiService) : UsersRepository{
-    override suspend fun getPost(userId: String?): Result<User> {
+    override suspend fun getUser(userId: String?): Result<User> {
         return try {
             val response = apiService.getUserById(userId ?: "1")
             if (response.isSuccessful && response.body() != null) {
@@ -21,7 +21,7 @@ class UserRepositoryImpl @Inject constructor(private val apiService: UsersApiSer
         }
     }
 
-    override suspend fun getPostsFeed(): Result<MockUsers> {
+    override suspend fun getAllUsers(): Result<MockUsers> {
         return try {
             val response = apiService.getAllUsers()
             if (response.isSuccessful && response.body() != null) {

@@ -8,11 +8,11 @@ interface UsersRepository {
     /**
      * Get a specific User.
      */
-    suspend fun getPost(userId: String?): Result<User>
+    suspend fun getUser(userId: String?): Result<User>
 
     /**
      * Get all users.
      */
-    suspend fun getPostsFeed(): Result<MockUsers>
+    suspend fun getAllUsers(): Result<MockUsers>
 
 }
