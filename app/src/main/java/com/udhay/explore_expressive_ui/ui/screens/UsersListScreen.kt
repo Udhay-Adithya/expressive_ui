@@ -10,8 +10,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,7 +57,9 @@ fun UsersListScreen(
             placeholder = {
                 if (searchBarState.currentValue == SearchBarValue.Collapsed) {
                     Text(
-                        modifier = Modifier.fillMaxWidth().clearAndSetSemantics {},
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clearAndSetSemantics {},
                         text = "Search",
                         textAlign = TextAlign.Center,
                     )
@@ -85,19 +87,7 @@ fun UsersListScreen(
                     Icon(Icons.Default.Search, contentDescription = null)
                 }
             },
-            trailingIcon = {
-                TooltipBox(
-                    positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
-                        TooltipAnchorPosition.Above
-                    ),
-                    tooltip = { PlainTooltip { Text("Mic") } },
-                    state = rememberTooltipState(),
-                ) {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(imageVector = Icons.Rounded.Search, contentDescription = "Mic")
-                    }
-                }
-            },
+            trailingIcon = null,
         )
     }
 
@@ -137,44 +127,66 @@ fun UsersListScreen(
             }
         }
     ) { paddingValues ->
-        when (val state = usersState) {
-            is UsersUiState.Loading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+        var isRefreshing by remember { mutableStateOf(false) }
+
+        LaunchedEffect(usersState) {
+            if (usersState !is UsersUiState.Loading || !isRefreshing) {
+                isRefreshing = false
             }
-            is UsersUiState.Success -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(state.users.users) { user ->
-                        UserTile(
-                            user = user,
-                            onClick = { onUserClick(user.id.toString()) }
-                        )
+        }
+
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = {
+                isRefreshing = true
+                viewModel.fetchAllUsers()
+            },
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            indicator = {  Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                LoadingIndicator()
+            } },
+
+        ) {
+            when (val state = usersState) {
+                is UsersUiState.Loading -> {
+                    if (!isRefreshing) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            LoadingIndicator()
+                        }
                     }
                 }
-            }
-            is UsersUiState.Error -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Error: ${state.message}",
-                        color = MaterialTheme.colorScheme.error
-                    )
+                is UsersUiState.Success -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(state.users.users) { user ->
+                            UserTile(
+                                user = user,
+                                onClick = { onUserClick(user.id.toString()) }
+                            )
+                        }
+                    }
+                }
+                is UsersUiState.Error -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Error: ${state.message}",
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
             }
         }
