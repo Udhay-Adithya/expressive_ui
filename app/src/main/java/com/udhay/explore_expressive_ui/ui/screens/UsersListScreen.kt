@@ -8,10 +8,12 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +47,7 @@ fun UsersListScreen(
     val textFieldState = rememberTextFieldState()
     val searchBarState = rememberSearchBarState()
     val scope = rememberCoroutineScope()
+    val pullToRefreshState = rememberPullToRefreshState()
     val scrollBehavior = SearchBarDefaults.enterAlwaysSearchBarScrollBehavior()
     val appBarWithSearchColors = SearchBarDefaults.appBarWithSearchColors()
 
@@ -100,19 +103,8 @@ fun UsersListScreen(
                 inputField = inputField,
                 navigationIcon = null,
                 actions = {
-                    TooltipBox(
-                        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
-                            TooltipAnchorPosition.Above
-                        ),
-                        tooltip = { PlainTooltip { Text("Account") } },
-                        state = rememberTooltipState(),
-                    ) {
-                        IconButton(onClick = { /* doSomething() */ }) {
-                            Icon(
-                                imageVector = Icons.Default.AccountCircle,
-                                contentDescription = "Account",
-                            )
-                        }
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Filled.Refresh, "Trigger Refresh")
                     }
                 },
                 colors = appBarWithSearchColors,
@@ -136,6 +128,7 @@ fun UsersListScreen(
         }
 
         PullToRefreshBox(
+            state = pullToRefreshState,
             isRefreshing = isRefreshing,
             onRefresh = {
                 isRefreshing = true
@@ -144,13 +137,13 @@ fun UsersListScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            indicator = {  Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                LoadingIndicator()
-            } },
-
+            indicator = {
+                PullToRefreshDefaults.LoadingIndicator(
+                    state = pullToRefreshState,
+                    isRefreshing = isRefreshing,
+                    modifier = Modifier.align(Alignment.TopCenter),
+                )
+            },
         ) {
             when (val state = usersState) {
                 is UsersUiState.Loading -> {
