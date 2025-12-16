@@ -103,7 +103,7 @@ fun UsersListScreen(
                 inputField = inputField,
                 navigationIcon = null,
                 actions = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {viewModel.fetchAllUsers()}) {
                         Icon(Icons.Filled.Refresh, "Trigger Refresh")
                     }
                 },
