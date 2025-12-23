@@ -1,5 +1,6 @@
 package com.udhay.explore_expressive_ui.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -255,12 +257,24 @@ fun UserTile(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(user.image)
                         .crossfade(true)
+                        .listener(
+                            onError = { _, result ->
+                                Log.e("IMAGE_ERROR", "Error", result.throwable)
+                            },
+                            onSuccess = { _, _ ->
+                                Log.d("IMAGE_SUCCESS", "Loaded successfully")
+                            }
+                        )
                         .build(),
                     placeholder = painterResource(R.drawable.avatar_placeholder),
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.clip(CircleShape),
+                    error = painterResource(R.drawable.avatar_placeholder),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
                 )
+
                 Text(
                     text = "${user.firstName} ${user.lastName}",
                     style = MaterialTheme.typography.titleMedium,
